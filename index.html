@@ -1,110 +1,1273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<title>Private Playlist</title>
+<title>Web Cloud Music</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f44336">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f8" media="(prefers-color-scheme: light)">
 <link rel="stylesheet" href="./w3.css">
 <style>
-	.w3-sidenav ul li {padding-left: 2px;}
-	#playlist li {word-break: break-all;}
-	.ellipsis {overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-</style>
-<style>
-@media (prefers-color-scheme: dark) {
-    * {
-        scrollbar-color: #2a2c2e #1c1e1f;
-    }
-    .w3-sidenav a:hover {
-        background-color: rgb(39, 41, 43);
-    }
-    .w3-pale-yellow, .w3-hover-pale-yellow:hover {
-        color: rgb(232, 230, 227) !important;
-        background-color: rgb(75, 75, 0) !important;
-    }
-    html, body, input, textarea, select, button {
-        background-color: #181a1b;
-        color: #e8e6e3;
-    }
-    .w3-light-grey, .w3-hover-light-grey:hover {
-        color: rgb(232, 230, 227) !important;
-        background-color: rgb(28, 30, 31) !important;
-    }
-    .w3-blue, .w3-hover-blue:hover {
-        color: rgb(255, 255, 255) !important;
-        background-color: rgb(9, 102, 175) !important;
-    }
+	:root {
+		--bg: #101114;
+		--surface: #17191d;
+		--surface-2: #202329;
+		--surface-3: #292d34;
+		--line: #30343c;
+		--text: #f4f6f8;
+		--muted: #a8b0bb;
+		--soft: #d7dce2;
+		--accent: #1ed760;
+		--accent-2: #4cc9f0;
+		--hires: #f4c430;
+		--cd-quality: #cfd6df;
+		--danger: #ff6b6b;
+		--player-accent: var(--accent);
+		--player-accent-contrast: var(--brand-text);
+		--page-bg: linear-gradient(145deg, #101114 0%, #15171b 45%, #101114 100%);
+		--sidebar-bg: rgba(18, 20, 24, .98);
+		--topbar-bg: rgba(16, 17, 20, .88);
+		--player-bg: rgba(13, 14, 17, .96);
+		--overlay-bg: rgba(0, 0, 0, .54);
+		--bar-line: rgba(48, 52, 60, .75);
+		--hover-line: #3d424c;
+		--brand-text: #06110b;
+		--accent-glow: rgba(30, 215, 96, .14);
+		--shadow: 0 22px 60px rgba(0, 0, 0, .34);
+		color-scheme: dark;
+		font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	}
 
-    #bufferbar.w3-progressbar {
-        background-color: rgb(61, 61, 61) !important;
-    }
-    .w3-progress-container {
-        background-color: rgb(28, 30, 31);
-    }
-    .w3-hoverable tbody tr:hover, .w3-ul.w3-hoverable li:hover {
-        background-color: rgb(39, 41, 43);
-    }
-    .w3-red, .w3-hover-red:hover {
-        background-color: rgb(163, 19, 9)!important;
-    }
-}
-</style>
+	@media (prefers-color-scheme: light) {
+		:root {
+			--bg: #f4f6f8;
+			--surface: #ffffff;
+			--surface-2: #eef2f6;
+			--surface-3: #e2e8ee;
+			--line: #d6dde6;
+			--text: #12161c;
+			--muted: #637083;
+			--soft: #2c3541;
+			--accent: #159947;
+			--accent-2: #087ea4;
+			--hires: #a26b00;
+			--cd-quality: #6f7884;
+			--danger: #c92f2f;
+			--player-accent: var(--accent);
+			--player-accent-contrast: var(--brand-text);
+			--page-bg: linear-gradient(145deg, #f4f6f8 0%, #eef2f6 52%, #ffffff 100%);
+			--sidebar-bg: rgba(255, 255, 255, .96);
+			--topbar-bg: rgba(247, 249, 251, .9);
+			--player-bg: rgba(255, 255, 255, .96);
+			--overlay-bg: rgba(16, 22, 30, .36);
+			--bar-line: rgba(214, 221, 230, .95);
+			--hover-line: #b9c4d0;
+			--brand-text: #06110b;
+			--accent-glow: rgba(21, 153, 71, .18);
+			--shadow: 0 18px 48px rgba(20, 35, 55, .16);
+			color-scheme: light;
+		}
+	}
 
-<nav class="w3-sidenav w3-collapse w3-light-grey w3-animate-left w3-card-2" style="z-index: 3; width: 250px; display: none;" id="mySidenav">
-<header class="w3-container w3-dark-grey">
-	<h2>Folders <a href="javascript:void(0)" onclick="w3_close()" class="w3-right w3-xlarge w3-hide-large w3-closenav" title="close sidenav">×</a></h2>
-</header>
-<ul class="w3-ul" style="margin-bottom: 120px;" id="folderlist">
-</ul>
+	* {
+		box-sizing: border-box;
+	}
+
+	html, body {
+		min-height: 100%;
+	}
+
+	body {
+		margin: 0;
+		background: var(--page-bg);
+		color: var(--text);
+		font-size: 16px;
+		letter-spacing: 0;
+	}
+
+	body[data-player-quality="hires"] {
+		--player-accent: var(--hires);
+		--player-accent-contrast: #171204;
+	}
+
+	body[data-player-quality="cd"] {
+		--player-accent: var(--cd-quality);
+		--player-accent-contrast: #11161c;
+	}
+
+	button, input, select {
+		font: inherit;
+		letter-spacing: 0;
+	}
+
+	button {
+		cursor: pointer;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.app-sidebar {
+		position: fixed;
+		inset: 0 auto 0 0;
+		z-index: 5;
+		width: 300px;
+		padding: 22px 18px 190px;
+		overflow-y: auto;
+		background: var(--sidebar-bg);
+		border-right: 1px solid var(--line);
+		box-shadow: none;
+	}
+
+	.sidebar-brand {
+		display: grid;
+		grid-template-columns: 48px minmax(0, 1fr) 36px;
+		gap: 12px;
+		align-items: center;
+		margin-bottom: 24px;
+	}
+
+	.brand-mark {
+		display: grid;
+		place-items: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 8px;
+		background: linear-gradient(135deg, var(--accent), var(--accent-2));
+		color: var(--brand-text);
+		font-size: .86rem;
+		font-weight: 900;
+	}
+
+	.eyebrow {
+		margin: 0 0 3px;
+		color: var(--muted);
+		font-size: .76rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.sidebar-brand h1 {
+		margin: 0;
+		font-size: 1.05rem;
+		line-height: 1.2;
+	}
+
+	.icon-button,
+	.text-button {
+		display: inline-grid;
+		place-items: center;
+		min-width: 36px;
+		height: 36px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface-2);
+		color: var(--text);
+		transition: background .18s ease, border-color .18s ease, transform .18s ease;
+	}
+
+	.icon-button:hover,
+	.text-button:hover {
+		background: var(--surface-3);
+		border-color: var(--hover-line);
+	}
+
+	.icon-button:active,
+	.text-button:active {
+		transform: scale(.98);
+	}
+
+	.icon-button:focus,
+	.text-button:focus,
+	.folder-button:focus,
+	.track-button:focus {
+		outline: none;
+	}
+
+	.icon-button:focus-visible,
+	.text-button:focus-visible,
+	.folder-button:focus-visible,
+	.track-button:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+
+	.icon-button[disabled],
+	.text-button[disabled] {
+		cursor: not-allowed;
+		opacity: .48;
+	}
+
+	.mobile-close {
+		display: none;
+	}
+
+	.search-box {
+		position: relative;
+		display: block;
+		margin-bottom: 0;
+		min-width: 0;
+	}
+
+	.search-box input {
+		width: 100%;
+		height: 44px;
+		padding: 0 42px 0 42px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--text);
+		outline: none;
+	}
+
+	.search-box input:focus {
+		border-color: var(--accent);
+		box-shadow: 0 0 0 3px var(--accent-glow);
+	}
+
+	.search-icon,
+	.clear-search {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.search-icon {
+		left: 14px;
+		width: 14px;
+		height: 14px;
+		border: 2px solid var(--muted);
+		border-radius: 50%;
+	}
+
+	.search-icon::after {
+		content: "";
+		position: absolute;
+		right: -6px;
+		bottom: -4px;
+		width: 7px;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--muted);
+		transform: rotate(45deg);
+	}
+
+	.clear-search {
+		right: 6px;
+		width: 32px;
+		height: 32px;
+		min-width: 32px;
+		border: 0;
+		background: transparent;
+	}
+
+	.sidebar-toolbar {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 10px;
+		margin-bottom: 20px;
+	}
+
+	.text-button {
+		padding: 0 12px;
+		font-size: .9rem;
+		font-weight: 700;
+	}
+
+	.sort-control {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: center;
+		gap: 8px;
+		height: 36px;
+		padding: 0 8px 0 12px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--muted);
+		font-size: .84rem;
+		font-weight: 700;
+	}
+
+	.sort-control select {
+		min-width: 0;
+		border: 0;
+		background: var(--surface);
+		color: var(--text);
+		outline: none;
+		color-scheme: dark;
+	}
+
+	.sort-control select option {
+		background: var(--surface-2);
+		color: var(--text);
+	}
+
+	@media (prefers-color-scheme: light) {
+		.sort-control select {
+			color-scheme: light;
+		}
+	}
+
+	.sidebar-label {
+		margin: 0 0 10px;
+		color: var(--muted);
+		font-size: .78rem;
+		font-weight: 800;
+		text-transform: uppercase;
+	}
+
+	.folder-nav li + li {
+		margin-top: 6px;
+	}
+
+	.folder-button {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 10px;
+		align-items: center;
+		width: 100%;
+		min-height: 42px;
+		padding: 8px 10px;
+		border: 1px solid transparent;
+		border-radius: 8px;
+		background: transparent;
+		color: var(--soft);
+		text-align: left;
+	}
+
+	.folder-button:hover,
+	.folder-button.is-active {
+		background: var(--surface-2);
+		border-color: var(--line);
+		color: var(--text);
+	}
+
+	.folder-name {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 700;
+	}
+
+	.folder-meta {
+		color: var(--muted);
+		font-size: .78rem;
+	}
+
+	.app-main {
+		min-height: 100vh;
+		margin-left: 300px;
+		padding-bottom: 190px;
+	}
+
+	.topbar {
+		position: sticky;
+		top: 0;
+		z-index: 3;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			"tools count"
+			"title count";
+		column-gap: 16px;
+		row-gap: 10px;
+		align-items: center;
+		min-height: 112px;
+		padding: 16px 30px;
+		background: var(--topbar-bg);
+		border-bottom: 1px solid var(--bar-line);
+		backdrop-filter: blur(18px);
+	}
+
+	.menu-button {
+		display: none;
+	}
+
+	.topbar-tools {
+		grid-area: tools;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.back-button {
+		font-size: 1.1rem;
+		font-weight: 900;
+	}
+
+	.topbar-search {
+		flex: 1;
+		max-width: 540px;
+	}
+
+	.topbar-search input {
+		height: 40px;
+	}
+
+	.topbar-title {
+		grid-area: title;
+		min-width: 0;
+	}
+
+	#current-path {
+		display: block;
+		margin-bottom: 4px;
+		color: var(--muted);
+		font-size: .8rem;
+		font-weight: 800;
+		text-transform: uppercase;
+	}
+
+	#content-title {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 2.15rem;
+		line-height: 1.05;
+	}
+
+	.library-count {
+		grid-area: count;
+		justify-self: end;
+		width: max-content;
+		padding: 8px 10px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--muted);
+		font-size: .88rem;
+		font-weight: 800;
+		white-space: nowrap;
+	}
+
+	.content {
+		width: min(1180px, 100%);
+		padding: 26px 30px 36px;
+	}
+
+	.section-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 16px;
+		margin: 10px 0 12px;
+	}
+
+	.section-head h2 {
+		margin: 0;
+		font-size: 1.05rem;
+	}
+
+	.section-head span {
+		color: var(--muted);
+		font-size: .88rem;
+	}
+
+	.folder-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 10px;
+		margin-bottom: 28px;
+	}
+
+	.folder-card {
+		min-width: 0;
+	}
+
+	.folder-card .folder-button {
+		min-height: 56px;
+		background: var(--surface);
+		border-color: var(--line);
+	}
+
+	.folder-card .folder-button:hover {
+		background: var(--surface-2);
+	}
+
+	.track-list {
+		display: grid;
+		gap: 6px;
+	}
+
+	.track-row {
+		min-width: 0;
+	}
+
+	.track-button {
+		display: grid;
+		grid-template-columns: 34px minmax(0, 1fr) auto;
+		gap: 12px;
+		align-items: center;
+		width: 100%;
+		min-height: 58px;
+		padding: 8px 12px;
+		border: 1px solid transparent;
+		border-radius: 8px;
+		background: transparent;
+		color: var(--text);
+		text-align: left;
+	}
+
+	.track-button:hover,
+	.track-button.is-active {
+		background: var(--surface);
+		border-color: var(--line);
+	}
+
+	.track-index {
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+	}
+
+	.track-text {
+		min-width: 0;
+	}
+
+	.track-title {
+		display: block;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 750;
+	}
+
+	.track-meta {
+		display: block;
+		margin-top: 4px;
+		color: var(--muted);
+		font-size: .84rem;
+	}
+
+	.track-quality {
+		display: inline-flex;
+		align-items: center;
+		max-width: 210px;
+		min-height: 26px;
+		padding: 4px 8px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--soft);
+		font-size: .8rem;
+		font-weight: 800;
+		white-space: nowrap;
+	}
+
+	.empty-state {
+		padding: 18px 12px;
+		color: var(--muted);
+		border: 1px dashed var(--line);
+		border-radius: 8px;
+	}
+
+	.player-dock {
+		position: fixed;
+		inset: auto 0 0 0;
+		z-index: 6;
+		padding: 14px 18px 18px;
+		background: var(--player-bg);
+		border-top: 1px solid var(--line);
+		box-shadow: var(--shadow);
+		backdrop-filter: blur(18px);
+	}
+
+	.player-grid {
+		display: grid;
+		grid-template-columns: minmax(240px, 1fr) minmax(340px, 1.35fr) minmax(240px, 1fr);
+		grid-template-areas:
+			"now transport empty"
+			"now quality empty";
+		column-gap: 18px;
+		row-gap: 8px;
+		align-items: center;
+	}
+
+	.now-playing {
+		grid-area: now;
+		display: grid;
+		grid-template-columns: 64px minmax(0, 1fr);
+		gap: 12px;
+		align-items: center;
+		min-width: 0;
+	}
+
+	.player-art {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 64px;
+		height: 64px;
+		padding: 0;
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: linear-gradient(135deg, #1ed760, #4cc9f0 55%, #f4c430);
+		color: #07100b;
+		font-size: .8rem;
+		font-weight: 950;
+	}
+
+	.player-art:hover {
+		border-color: var(--hover-line);
+	}
+
+	.player-art img {
+		position: absolute;
+		inset: 0;
+		display: none;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.player-art.has-cover {
+		background: #050607;
+		color: transparent;
+	}
+
+	.player-art.has-cover img {
+		display: block;
+	}
+
+	.player-art.has-cover .art-fallback {
+		display: none;
+	}
+
+	.track-now {
+		min-width: 0;
+	}
+
+	#nowPlaying {
+		margin: 0;
+		font-weight: 850;
+	}
+
+	#playerMeta {
+		display: block;
+		margin-top: 5px;
+		color: var(--muted);
+		font-size: .86rem;
+	}
+
+	.transport {
+		grid-area: transport;
+		min-width: 0;
+	}
+
+	.time-row {
+		display: grid;
+		grid-template-columns: 52px minmax(0, 1fr) 52px;
+		gap: 10px;
+		align-items: center;
+		color: var(--muted);
+		font-size: .82rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	#curTime {
+		text-align: right;
+	}
+
+	#totalTime {
+		text-align: left;
+	}
+
+	.controls {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		margin-top: 12px;
+	}
+
+	.play-button {
+		width: 48px;
+		height: 48px;
+		min-width: 48px;
+		border-radius: 50%;
+		border-color: var(--player-accent);
+		background: var(--player-accent);
+		color: var(--player-accent-contrast);
+		font-weight: 900;
+	}
+
+	.mode-button {
+		width: 40px;
+		min-width: 40px;
+		padding: 0;
+		color: var(--muted);
+		font-weight: 800;
+	}
+
+	.mode-button svg,
+	.icon-button svg {
+		display: block;
+		width: 18px;
+		height: 18px;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		fill: none;
+	}
+
+	.play-button svg {
+		width: 38px;
+		height: 38px;
+	}
+
+	.full-controls .play-button svg {
+		width: 46px;
+		height: 46px;
+	}
+
+	.play-button .solid-icon,
+	.play-button .pause-bar {
+		fill: currentColor;
+		stroke: none;
+	}
+
+	.mode-button.is-on {
+		border-color: rgba(30, 215, 96, .48);
+		background: rgba(30, 215, 96, .12);
+		color: var(--accent);
+	}
+
+	.quality-panel {
+		grid-area: quality;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		text-align: center;
+	}
+
+	.quality-badge {
+		display: inline-grid;
+		place-items: center;
+		min-width: 76px;
+		min-height: 30px;
+		padding: 4px 10px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--surface-2);
+		color: var(--soft);
+		font-size: .82rem;
+		font-weight: 950;
+	}
+
+	.quality-badge[data-tier="hires"] {
+		border-color: rgba(244, 196, 48, .65);
+		background: rgba(244, 196, 48, .16);
+		color: var(--hires);
+	}
+
+	.quality-badge[data-tier="cd"] {
+		border-color: rgba(76, 201, 240, .52);
+		background: rgba(76, 201, 240, .13);
+		color: var(--accent-2);
+	}
+
+	.quality-badge[data-tier="lossy"] {
+		color: var(--muted);
+	}
+
+	#qualityDetails {
+		max-width: min(100%, 420px);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--muted);
+		font-size: .84rem;
+	}
+
+	.art-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 9;
+		display: none;
+		place-items: stretch;
+		min-height: 100dvh;
+		padding: clamp(16px, 3vw, 36px);
+		overflow-y: auto;
+	}
+
+	.art-modal.is-open {
+		display: grid;
+	}
+
+	.art-modal-backdrop {
+		position: absolute;
+		inset: 0;
+		border: 0;
+		background: radial-gradient(circle at 18% 12%, rgba(30, 215, 96, .14), transparent 32%),
+			linear-gradient(145deg, rgba(7, 8, 10, .96), rgba(13, 15, 18, .98));
+	}
+
+	.art-modal-panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
+		gap: clamp(18px, 3vw, 34px);
+		width: min(1180px, 100%);
+		min-height: calc(100dvh - clamp(32px, 6vw, 72px));
+		margin: 0 auto;
+		color: #f4f6f8;
+	}
+
+	.art-modal-close {
+		position: fixed;
+		top: clamp(16px, 3vw, 32px);
+		right: clamp(16px, 3vw, 32px);
+		z-index: 3;
+		background: rgba(16, 17, 20, .74);
+		color: #f4f6f8;
+		border-color: rgba(255, 255, 255, .16);
+	}
+
+	.full-player {
+		display: grid;
+		grid-template-columns: minmax(260px, min(48vw, 620px)) minmax(280px, 1fr);
+		gap: clamp(24px, 5vw, 58px);
+		align-items: center;
+		min-height: 0;
+	}
+
+	.full-art-frame {
+		display: block;
+		width: 100%;
+		max-height: min(72dvh, 640px);
+		aspect-ratio: 1;
+		overflow: hidden;
+		border: 0;
+		border-radius: 8px;
+		background: #050607;
+		box-shadow: 0 32px 100px rgba(0, 0, 0, .52);
+	}
+
+	.art-modal img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.full-player-copy {
+		display: grid;
+		justify-items: center;
+		min-width: 0;
+		text-align: center;
+	}
+
+	.art-modal-title {
+		margin: 0;
+		width: min(520px, 100%);
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: clamp(1.55rem, 3.2vw, 3.4rem);
+		line-height: 1.05;
+		font-weight: 850;
+	}
+
+	.art-modal-meta {
+		display: block;
+		margin-top: 12px;
+		width: min(520px, 100%);
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: rgba(244, 246, 248, .76);
+		font-size: 1rem;
+	}
+
+	.full-quality {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		margin-top: 22px;
+		width: min(520px, 100%);
+		min-width: 0;
+	}
+
+	.full-quality #artModalQualityDetails {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: rgba(244, 246, 248, .72);
+		font-size: .9rem;
+	}
+
+	.full-progress-row {
+		display: grid;
+		grid-template-columns: 52px minmax(0, 1fr) 52px;
+		gap: 10px;
+		align-items: center;
+		margin-top: 34px;
+		width: min(520px, 100%);
+		color: rgba(244, 246, 248, .72);
+		font-size: .84rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.full-progress-row span:first-child {
+		text-align: right;
+	}
+
+	.full-progress {
+		position: relative;
+		display: block;
+		width: 100%;
+		height: 16px;
+		padding: 0;
+		border: 0;
+		border-radius: 999px;
+		background: transparent;
+		overflow: hidden;
+	}
+
+	.full-progress::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 6px;
+		height: 4px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, .18);
+	}
+
+	.full-progress span {
+		position: absolute;
+		left: 0;
+		top: 6px;
+		height: 4px;
+		border-radius: 999px;
+	}
+
+	.full-progress-buffer {
+		width: 0;
+		background: rgba(255, 255, 255, .28);
+	}
+
+	.full-progress-fill {
+		width: 0;
+		background: var(--player-accent);
+	}
+
+	.full-controls {
+		justify-content: center;
+		gap: 12px;
+		margin-top: 24px;
+		width: min(520px, 100%);
+	}
+
+	.full-controls .play-button {
+		width: 58px;
+		height: 58px;
+		min-width: 58px;
+	}
+
+	body.art-modal-open {
+		overflow: hidden;
+	}
+
+	#myOverlay {
+		position: fixed;
+		inset: 0;
+		z-index: 4;
+		display: none;
+		background: var(--overlay-bg);
+	}
+
+	@media (max-width: 980px) {
+		.app-sidebar {
+			transform: translateX(-100%);
+			transition: transform .22s ease;
+			box-shadow: var(--shadow);
+		}
+
+		.app-sidebar.is-open {
+			transform: translateX(0);
+		}
+
+		.mobile-close,
+		.menu-button {
+			display: inline-grid;
+		}
+
+		#myOverlay.is-open {
+			display: block;
+		}
+
+		.app-main {
+			margin-left: 0;
+		}
+
+		.topbar {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-areas:
+				"tools"
+				"title";
+			padding: 14px 18px;
+		}
+
+		.library-count {
+			display: none;
+		}
+	}
+
+	@media (max-width: 760px) {
+		.art-modal {
+			padding: 0 16px 16px;
+		}
+
+		.art-modal-panel {
+			min-height: calc(100dvh - 16px);
+		}
+
+		.topbar-tools {
+			gap: 8px;
+		}
+
+		.topbar-search {
+			max-width: none;
+		}
+
+		.topbar-search input {
+			padding-right: 36px;
+		}
+
+		.content {
+			padding: 20px 16px 34px;
+		}
+
+		.folder-grid {
+			grid-template-columns: 1fr;
+		}
+
+		#content-title {
+			font-size: 1.5rem;
+		}
+
+		.track-button {
+			grid-template-columns: 28px minmax(0, 1fr);
+		}
+
+		.track-quality {
+			display: none;
+		}
+
+		.player-dock {
+			padding: 12px;
+		}
+
+		.player-grid {
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				"now"
+				"transport"
+				"quality";
+			gap: 12px;
+		}
+
+		.quality-panel {
+			justify-content: center;
+			align-items: center;
+		}
+
+		.full-player {
+			grid-template-columns: 1fr;
+			align-content: start;
+			align-items: start;
+			gap: 28px;
+		}
+
+		.full-art-frame {
+			width: min(100%, 58dvh);
+			justify-self: center;
+		}
+
+		.full-player-copy {
+			margin-top: 10px;
+		}
+
+		.art-modal-title {
+			font-size: clamp(1.35rem, 8vw, 2rem);
+		}
+
+		.full-quality,
+		.full-controls {
+			justify-content: center;
+		}
+	}
+</style>
+</head>
+<body>
+<nav class="app-sidebar" id="mySidenav" aria-label="Music folders">
+	<div class="sidebar-brand">
+		<div class="brand-mark">WCM</div>
+		<div class="ellipsis">
+			<p class="eyebrow">Music Library</p>
+			<h1 class="ellipsis" id="server-name">Web Cloud Music</h1>
+		</div>
+		<button class="icon-button mobile-close" onclick="w3_close()" title="Close" aria-label="Close">&times;</button>
+	</div>
+
+	<div class="sidebar-toolbar">
+		<label class="sort-control" for="folder-sort">
+			<span>Sort</span>
+			<select id="folder-sort" title="Folder sort">
+				<option value="name-asc">A-Z</option>
+				<option value="name-desc">Z-A</option>
+				<option value="time-desc">Newest</option>
+				<option value="time-asc">Oldest</option>
+			</select>
+		</label>
+	</div>
+
+	<p class="sidebar-label">Folders</p>
+	<ul class="folder-nav" id="folderlist"></ul>
 </nav>
-<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor: pointer; display: none;" id="myOverlay"></div>
-<div class="w3-main" style="margin-left:250px;">
-	<header class="w3-container w3-red w3-top">
-		<h2 class="ellipsis"><span class="w3-opennav w3-xlarge w3-left w3-hide-large" onclick="w3_open()" id="openNav">&#9776;</span>&nbsp;<span id="server-name">Private Cloud Music</span></h2>
-	</header>
-	<header class="w3-container w3-yellow"><h2 class="ellipsis">You can't see me</h2></header>
-	<ul class="w3-ul w3-hoverable w3-pale-yellow" id="subfolderlist">
-	</ul>
-	<ul class="w3-ul w3-hoverable" style="margin-bottom: 120px;" id="playlist">
-	</ul>
-</div>
-<div class="w3-bottom" style="z-index: 6;">
-	<div class="w3-panel w3-brown">
-		<div class="w3-row">
-			<div class="w3-col s2 w3-container w3-left-align">
-				<p><span id="curTime">0:00</span></p>
+
+<div id="myOverlay" onclick="w3_close()"></div>
+
+<main class="app-main">
+	<header class="topbar">
+		<div class="topbar-tools">
+			<button class="icon-button menu-button" onclick="w3_open()" id="openNav" title="Open folders" aria-label="Open folders">&#9776;</button>
+			<button class="icon-button back-button" id="btn-folder-back" title="Back" aria-label="Back">&#8592;</button>
+			<div class="search-box topbar-search">
+				<span class="search-icon" aria-hidden="true"></span>
+				<input type="search" id="search-input" placeholder="Search songs" aria-label="Search songs" autocomplete="off">
+				<button class="icon-button clear-search" id="search-clear" title="Clear search" aria-label="Clear search">&times;</button>
 			</div>
-			<div class="w3-col s8 w3-container w3-center">
+		</div>
+		<div class="topbar-title">
+			<span id="current-path">Library</span>
+			<strong id="content-title">Web Cloud Music</strong>
+		</div>
+		<div class="library-count" id="library-count">0 tracks</div>
+	</header>
+
+	<section class="content">
+		<div class="section-head">
+			<h2>Folders</h2>
+			<span id="folder-count">0 folders</span>
+		</div>
+		<ul class="folder-grid" id="subfolderlist"></ul>
+
+		<div class="section-head">
+			<h2>Tracks</h2>
+			<span id="search-status">Ready</span>
+		</div>
+		<ul class="track-list" id="playlist"></ul>
+	</section>
+</main>
+
+<footer class="player-dock">
+	<div class="player-grid">
+		<div class="now-playing">
+			<button class="player-art" id="playerArtButton" type="button" title="Album art" aria-label="Open album art" aria-disabled="true">
+				<img id="playerArtImage" alt="">
+				<span class="art-fallback" id="playerArtFallback">WCM</span>
+			</button>
+			<div class="track-now">
 				<p id="nowPlaying" class="ellipsis">Not playing at all.</p>
+				<span id="playerMeta" class="ellipsis">Choose a track to begin</span>
 				<audio></audio>
 			</div>
-			<div class="w3-col s2 w3-container w3-right-align">
-				<p><span id="totalTime">0:00</span></p>
+		</div>
+
+		<div class="transport">
+			<div class="time-row">
+				<span id="curTime">0:00</span>
+				<pcm-progress id="progress-bar"></pcm-progress>
+				<span id="totalTime">0:00</span>
+			</div>
+			<div class="controls">
+				<button class="icon-button mode-button" id="btn-loop" title="Repeat one" aria-label="Repeat one" aria-pressed="false"></button>
+				<button class="icon-button" id="btn-prev" title="Previous" aria-label="Previous">&#9664;&#9664;</button>
+				<button class="icon-button play-button" id="btn-play" title="Play" aria-label="Play"></button>
+				<button class="icon-button" id="btn-next" title="Next" aria-label="Next">&#9654;&#9654;</button>
+				<button class="icon-button mode-button" id="btn-order" title="List playback" aria-label="List playback" aria-pressed="false"></button>
 			</div>
 		</div>
-		<div class="w3-container">
-			<pcm-progress id="progress-bar"></pcm-progress>
-		</div>
-		<div class="w3-container w3-center" style="padding:6px 0px;">
-			<button class="w3-btn w3-tiny" id="btn-prev">&lt;&lt;</button>
-			<button class="w3-btn w3-tiny" id="btn-play">Play</button>
-			<button class="w3-btn w3-tiny" id="btn-next">&gt;&gt;</button>
-			<button class="w3-btn w3-tiny" id="btn-loop">Loop</button>
-			<button class="w3-btn w3-tiny" id="btn-order">Order</button>
+
+		<div class="quality-panel">
+			<span id="qualityBadge" class="quality-badge" data-tier="unknown">--</span>
+			<span id="qualityDetails">Audio quality unavailable</span>
 		</div>
 	</div>
-</div> 
+</footer>
+
+<div class="art-modal" id="artModal" aria-hidden="true">
+	<button class="art-modal-backdrop" id="artModalBackdrop" type="button" aria-label="Close album art"></button>
+	<div class="art-modal-panel" role="dialog" aria-modal="true" aria-labelledby="artModalTitle">
+		<button class="icon-button art-modal-close" id="artModalClose" type="button" title="Close" aria-label="Close">&times;</button>
+		<div class="full-player">
+			<div class="full-art-frame">
+				<img id="artModalImage" alt="">
+			</div>
+			<div class="full-player-copy">
+				<p class="art-modal-title" id="artModalTitle">Not playing at all.</p>
+				<span class="art-modal-meta" id="artModalMeta">Choose a track to begin</span>
+				<div class="full-quality">
+					<span id="artModalQualityBadge" class="quality-badge" data-tier="unknown">--</span>
+					<span id="artModalQualityDetails">Audio quality unavailable</span>
+				</div>
+				<div class="full-progress-row">
+					<span id="fullCurTime">0:00</span>
+					<button class="full-progress" id="fullProgress" type="button" aria-label="Seek">
+						<span class="full-progress-buffer" id="fullProgressBuffer"></span>
+						<span class="full-progress-fill" id="fullProgressFill"></span>
+					</button>
+					<span id="fullTotalTime">0:00</span>
+				</div>
+				<div class="controls full-controls">
+					<button class="icon-button mode-button" id="fullBtnLoop" title="Repeat one" aria-label="Repeat one" aria-pressed="false"></button>
+					<button class="icon-button" id="fullBtnPrev" title="Previous" aria-label="Previous">&#9664;&#9664;</button>
+					<button class="icon-button play-button" id="fullBtnPlay" title="Play" aria-label="Play"></button>
+					<button class="icon-button" id="fullBtnNext" title="Next" aria-label="Next">&#9654;&#9654;</button>
+					<button class="icon-button mode-button" id="fullBtnOrder" title="List playback" aria-label="List playback" aria-pressed="false"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 <script src="./progress-bar.js"></script>
 <script src="./player.js"></script>
 <script>
 function w3_open() {
-    document.getElementById("mySidenav").style.display = "block";
-    document.getElementById("myOverlay").style.display = "block";
+	document.getElementById("mySidenav").classList.add("is-open");
+	document.getElementById("myOverlay").classList.add("is-open");
 }
 function w3_close() {
-    document.getElementById("mySidenav").style.display = "none";
-    document.getElementById("myOverlay").style.display = "none";
+	document.getElementById("mySidenav").classList.remove("is-open");
+	document.getElementById("myOverlay").classList.remove("is-open");
 }
 </script>
+</body>
 </html>

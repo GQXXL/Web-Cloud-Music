@@ -1,6 +1,6 @@
 ## API Description
 
-- All APIs are directly send to the backend of Private Cloud Music. For example, `api.php` on your server. and all APIs are using **POST** method. 
+- All APIs are directly send to the backend of Web Cloud Music. For example, `api.php` on your server. and all APIs are using **POST** method.
 
 - Content-Type of your request should be `x-www-form-urlencoded`. 
 
@@ -31,7 +31,7 @@
 		"serverShortName": "SN",
 		"baseFolderNameHint": "sn",
 		"preferredFormatsHint": "mp3,ogg",
-		"apiVersion": 1,
+		"apiVersion": 2,
 		"mediaRootUrl": "http://localhost/pcm/"
 	}
 }
@@ -56,19 +56,91 @@
 			"musicList": [
 				{
 					"fileName": "FileName.mp3",
+					"displayName": "FileName.mp3",
+					"folder": "FolderA/",
 					"fileSize": 123123123,
 					"modifiedTime": "1313065072",
+					"extension": "mp3",
+					"audioInfo": {
+						"format": "MP3",
+						"codec": "MPEG-1 Layer III",
+						"sampleRate": 44100,
+						"bitRate": 320000,
+						"channels": 2
+					},
 					"additionalInfo": false
 				},
 				{
 					"fileName": "FileName2.wav",
+					"displayName": "FileName2.wav",
+					"folder": "FolderA/",
 					"fileSize": 123123123,
 					"modifiedTime": "1313065072",
+					"extension": "wav",
+					"audioInfo": {
+						"format": "WAV",
+						"codec": "PCM",
+						"sampleRate": 48000,
+						"bitsPerSample": 24,
+						"bitRate": 2304000,
+						"channels": 2
+					},
 					"additionalInfo": false
 				}
 			],
 			"subFolderList": [
-				"FolderA/SubfolderA", "FolderA/SubfolderB"
+				{
+					"path": "FolderA/SubfolderA",
+					"fileName": "SubfolderA",
+					"displayName": "SubfolderA",
+					"modifiedTime": "1313065072"
+				},
+				{
+					"path": "FolderA/SubfolderB",
+					"fileName": "SubfolderB",
+					"displayName": "SubfolderB",
+					"modifiedTime": "1313065072"
+				}
+			]
+		}
+	}
+}
+```
+
+`audioInfo` is parsed from file headers when possible. Current built-in parsers detect MP3 frame headers, WAV RIFF/fmt chunks, and FLAC STREAMINFO blocks. Other allowed browser formats return at least their `format` value.
+
+### Search music by file or folder name.
+
+* POST:
+	+ 'do' = "searchmusic"
+	+ 'q' = search keyword
+
+* RETURN:
+	json with the following struct.
+
+``` json
+{
+	"status": 200,
+	"message": "OK",
+	"result": {
+		"type": "searchResult",
+		"data": {
+			"musicList": [
+				{
+					"fileName": "FileName.flac",
+					"displayName": "FileName.flac",
+					"folder": "FolderA/",
+					"fileSize": 123123123,
+					"modifiedTime": "1313065072",
+					"extension": "flac",
+					"audioInfo": {
+						"format": "FLAC",
+						"sampleRate": 96000,
+						"bitsPerSample": 24,
+						"channels": 2
+					},
+					"additionalInfo": false
+				}
 			]
 		}
 	}
@@ -97,7 +169,7 @@ Once you get the URL, just feed the url to the player.
 
 ## Example
 
-We assume your Private Cloud Music backend can be access at url `http://foo.bar/baz/api.php` and we use `wget` for the following example.
+We assume your Web Cloud Music backend can be access at url `http://foo.bar/baz/api.php` and we use `wget` for the following example.
 
 ### Get file list of given folder name.
 

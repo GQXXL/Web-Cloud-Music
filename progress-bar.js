@@ -5,67 +5,81 @@ class ProgressBar extends HTMLElement {
     static get observedAttributes() {
         return ['value', 'buffer', 'data-chapters'];
     }
-    
+
     constructor() {
-        super(); // always call super() first in the constructor.
+        super();
         const shadow = this.attachShadow({mode: 'open'});
-        
+
         const container = document.createElement('div');
         container.setAttribute('class', 'container');
-        
+
         const bufferBar = document.createElement('div');
         bufferBar.setAttribute('id', 'bufferbar');
-        
+
         const timeBar = document.createElement('div');
         timeBar.setAttribute('id', 'timebar');
-        
+
         const chapterContainer = document.createElement('div');
         chapterContainer.setAttribute('id', 'chapter-container');
-        
+
         const style = document.createElement('style');
         style.textContent = `
+            :host {
+                display: block;
+                width: 100%;
+                cursor: pointer;
+            }
             .container {
-                height: 1.5em;
                 position: relative;
-                background-color: #f1f1f1;
+                width: 100%;
+                height: 8px;
+                overflow: hidden;
+                border-radius: 8px;
+                background-color: #2b2f36;
             }
             .container > div {
-                height: 100%;
                 position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
             }
             #timebar {
-                background-color: #2196F3;
+                z-index: 2;
+                background-color: var(--player-accent, #1ed760);
             }
             #bufferbar {
-                background-color: #AAA;
+                z-index: 1;
+                background-color: #4a515c;
             }
-            .container, #chapter-container {
+            #chapter-container {
+                z-index: 3;
                 width: 100%;
+                pointer-events: none;
             }
             .chapter {
-                height: 100%;
-                width: stretch; width: -moz-available; width: -webkit-fill-available;
-                border-left: .15em solid #0045F340;
                 position: absolute;
+                width: 100%;
+                height: 100%;
+                border-left: 2px solid rgba(244, 196, 48, .64);
             }
         `;
-        
+
         shadow.appendChild(container);
         shadow.appendChild(style);
         container.appendChild(bufferBar);
         container.appendChild(timeBar);
         container.appendChild(chapterContainer);
     }
-    
+
     connectedCallback() {
         spawnChapters(this);
         updateStyle(this);
     };
-    
+
     attributeChangedCallback(name, oldValue, newValue) {
         if (name == "data-chapters") {
             spawnChapters(this);
-        } 
+        }
         updateStyle(this);
     }
 }
@@ -86,12 +100,18 @@ function spawnChapters(elem) {
     });
 }
 
+function safePercent(value) {
+    value = Number(value);
+    if (!Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(100, value));
+}
+
 function updateStyle(elem) {
     const shadow = elem.shadowRoot;
     let timebar = shadow.querySelector('#timebar');
-    timebar.setAttribute('style', `width: ${elem.getAttribute('value')}%`);
+    timebar.setAttribute('style', `width: ${safePercent(elem.getAttribute('value'))}%`);
     let bufferbar = shadow.querySelector('#bufferbar');
-    bufferbar.setAttribute('style', `width: ${elem.getAttribute('buffer')}%`);
+    bufferbar.setAttribute('style', `width: ${safePercent(elem.getAttribute('buffer'))}%`);
 }
 
 customElements.define('pcm-progress', ProgressBar);
