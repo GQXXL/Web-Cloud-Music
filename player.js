@@ -176,10 +176,16 @@ function plural(count, single, multi) {
 }
 function controlIcon(name) {
     if (name == "play") {
-        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="solid-icon" d="M6.8 4.2v15.6L19.2 12z"></path></svg>';
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="solid-icon" d="M7.8 4.1v15.8L20.1 12z"></path></svg>';
     }
     if (name == "pause") {
-        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect class="pause-bar" x="4.6" y="4.4" width="5.2" height="15.2" rx="1.35"></rect><rect class="pause-bar" x="12" y="4.4" width="5.2" height="15.2" rx="1.35"></rect></svg>';
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect class="pause-bar" x="5.6" y="4.2" width="5.2" height="15.6" rx="1.35"></rect><rect class="pause-bar" x="12.6" y="4.2" width="5.2" height="15.6" rx="1.35"></rect></svg>';
+    }
+    if (name == "previous") {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="solid-icon" d="M5.2 6h2.4v12H5.2z"></path><path class="solid-icon" d="M18.8 5.5v13L8.6 12z"></path></svg>';
+    }
+    if (name == "next") {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="solid-icon" d="M16.4 6h2.4v12h-2.4z"></path><path class="solid-icon" d="M5.2 5.5v13L15.4 12z"></path></svg>';
     }
     if (name == "list") {
         return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 6h13"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M3 6h.01"></path><path d="M3 12h.01"></path><path d="M3 18h.01"></path></svg>';
@@ -915,6 +921,10 @@ function controlIcon(name) {
             var that = this;
             H("btn-play").innerHTML(controlIcon("play"));
             H("fullBtnPlay").innerHTML(controlIcon("play"));
+            H("btn-prev").innerHTML(controlIcon("previous"));
+            H("btn-next").innerHTML(controlIcon("next"));
+            H("fullBtnPrev").innerHTML(controlIcon("previous"));
+            H("fullBtnNext").innerHTML(controlIcon("next"));
 
             this.audio.ontimeupdate = () => {
                 this.applyChapterData();

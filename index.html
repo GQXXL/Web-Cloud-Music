@@ -176,6 +176,13 @@
 		transition: background .18s ease, border-color .18s ease, transform .18s ease;
 	}
 
+	.icon-button {
+		padding: 0;
+		line-height: 1;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
 	.icon-button:hover,
 	.text-button:hover {
 		background: var(--surface-3);
@@ -220,7 +227,11 @@
 	}
 
 	.search-box input {
+		box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
 		width: 100%;
+		min-width: 0;
 		height: 44px;
 		padding: 0 42px 0 42px;
 		border: 1px solid var(--line);
@@ -409,7 +420,9 @@
 	}
 
 	.topbar-search {
-		flex: 1;
+		flex: 1 1 0;
+		width: min(540px, 100%);
+		min-width: 0;
 		max-width: 540px;
 	}
 
@@ -718,6 +731,7 @@
 	.mode-button svg,
 	.icon-button svg {
 		display: block;
+		flex: none;
 		width: 18px;
 		height: 18px;
 		stroke: currentColor;
@@ -732,13 +746,24 @@
 		height: 38px;
 	}
 
+	.skip-button svg {
+		width: 26px;
+		height: 26px;
+	}
+
 	.full-controls .play-button svg {
 		width: 46px;
 		height: 46px;
 	}
 
+	.full-controls .skip-button svg {
+		width: 30px;
+		height: 30px;
+	}
+
 	.play-button .solid-icon,
-	.play-button .pause-bar {
+	.play-button .pause-bar,
+	.skip-button .solid-icon {
 		fill: currentColor;
 		stroke: none;
 	}
@@ -1040,23 +1065,31 @@
 
 	@media (max-width: 760px) {
 		.art-modal {
-			padding: 0 16px 16px;
+			padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
 		}
 
 		.art-modal-panel {
-			min-height: calc(100dvh - 16px);
+			display: block;
+			height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+			min-height: auto;
 		}
 
 		.topbar-tools {
-			gap: 8px;
+			display: grid;
+			grid-template-columns: auto auto minmax(0, 1fr);
+			gap: clamp(6px, 2vw, 8px);
+			width: 100%;
 		}
 
 		.topbar-search {
+			width: 100%;
+			min-width: 0;
 			max-width: none;
 		}
 
 		.topbar-search input {
 			padding-right: 36px;
+			font-size: 16px;
 		}
 
 		.content {
@@ -1080,7 +1113,7 @@
 		}
 
 		.player-dock {
-			padding: 12px;
+			padding: 10px 12px calc(14px + env(safe-area-inset-bottom));
 		}
 
 		.player-grid {
@@ -1089,32 +1122,125 @@
 				"now"
 				"transport"
 				"quality";
-			gap: 12px;
+			gap: 8px;
+		}
+
+		.now-playing {
+			grid-template-columns: 52px minmax(0, 1fr);
+			gap: 10px;
+		}
+
+		.player-art {
+			width: 52px;
+			height: 52px;
+		}
+
+		#nowPlaying {
+			font-size: .95rem;
+		}
+
+		#playerMeta {
+			font-size: .8rem;
+		}
+
+		.time-row {
+			grid-template-columns: 44px minmax(0, 1fr) 44px;
+			gap: 8px;
+			font-size: .78rem;
+		}
+
+		.controls {
+			gap: 8px;
+			margin-top: 10px;
+		}
+
+		.icon-button {
+			min-width: 38px;
+			height: 38px;
+		}
+
+		.mode-button {
+			width: 38px;
+			min-width: 38px;
+		}
+
+		.play-button {
+			width: 52px;
+			height: 52px;
+			min-width: 52px;
+		}
+
+		.play-button svg {
+			width: 38px;
+			height: 38px;
+		}
+
+		.skip-button svg {
+			width: 24px;
+			height: 24px;
 		}
 
 		.quality-panel {
-			justify-content: center;
-			align-items: center;
+			display: flex;
+			gap: 8px;
+			overflow: hidden;
+		}
+
+		.quality-badge {
+			min-width: 64px;
+			min-height: 26px;
+			padding: 3px 8px;
+			font-size: .76rem;
+		}
+
+		#qualityDetails {
+			max-width: calc(100% - 72px);
+			font-size: .78rem;
 		}
 
 		.full-player {
 			grid-template-columns: 1fr;
-			align-content: start;
-			align-items: start;
-			gap: 28px;
+			grid-template-rows: minmax(0, 1fr) auto;
+			height: 100%;
+			min-height: 0;
+			align-content: stretch;
+			align-items: center;
+			gap: clamp(16px, 3dvh, 28px);
 		}
 
 		.full-art-frame {
-			width: min(100%, 58dvh);
+			width: min(100%, 56dvh, calc(100dvh - 340px));
+			align-self: center;
 			justify-self: center;
 		}
 
 		.full-player-copy {
-			margin-top: 10px;
+			align-self: end;
+			margin-top: 0;
 		}
 
 		.art-modal-title {
 			font-size: clamp(1.35rem, 8vw, 2rem);
+		}
+
+		.full-progress-row {
+			margin-top: 22px;
+		}
+
+		.full-controls {
+			margin-top: 18px;
+			gap: 10px;
+		}
+
+		.full-controls .play-button {
+			width: 56px;
+			height: 56px;
+			min-width: 56px;
+		}
+
+		.full-controls .play-button svg {
+			width: 42px;
+			height: 42px;
 		}
 
 		.full-quality,
@@ -1208,9 +1334,9 @@
 			</div>
 			<div class="controls">
 				<button class="icon-button mode-button" id="btn-loop" title="Repeat one" aria-label="Repeat one" aria-pressed="false"></button>
-				<button class="icon-button" id="btn-prev" title="Previous" aria-label="Previous">&#9664;&#9664;</button>
+				<button class="icon-button skip-button" id="btn-prev" title="Previous" aria-label="Previous"></button>
 				<button class="icon-button play-button" id="btn-play" title="Play" aria-label="Play"></button>
-				<button class="icon-button" id="btn-next" title="Next" aria-label="Next">&#9654;&#9654;</button>
+				<button class="icon-button skip-button" id="btn-next" title="Next" aria-label="Next"></button>
 				<button class="icon-button mode-button" id="btn-order" title="List playback" aria-label="List playback" aria-pressed="false"></button>
 			</div>
 		</div>
@@ -1247,9 +1373,9 @@
 				</div>
 				<div class="controls full-controls">
 					<button class="icon-button mode-button" id="fullBtnLoop" title="Repeat one" aria-label="Repeat one" aria-pressed="false"></button>
-					<button class="icon-button" id="fullBtnPrev" title="Previous" aria-label="Previous">&#9664;&#9664;</button>
+					<button class="icon-button skip-button" id="fullBtnPrev" title="Previous" aria-label="Previous"></button>
 					<button class="icon-button play-button" id="fullBtnPlay" title="Play" aria-label="Play"></button>
-					<button class="icon-button" id="fullBtnNext" title="Next" aria-label="Next">&#9654;&#9654;</button>
+					<button class="icon-button skip-button" id="fullBtnNext" title="Next" aria-label="Next"></button>
 					<button class="icon-button mode-button" id="fullBtnOrder" title="List playback" aria-label="List playback" aria-pressed="false"></button>
 				</div>
 			</div>
