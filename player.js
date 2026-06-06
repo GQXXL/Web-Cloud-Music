@@ -174,6 +174,14 @@ function coverUrlForItem(item) {
 function plural(count, single, multi) {
     return count + " " + (count == 1 ? single : multi);
 }
+function normalizedFolderKey(text) {
+    return safeDecode(text || "").trim().toLowerCase().replace(/[\s_-]+/g, "");
+}
+function isDefaultFirstFolder(item) {
+    var target = "newmusicfri";
+    return normalizedFolderKey(displayName(item)) == target ||
+        normalizedFolderKey(leafPath(item && item.path)) == target;
+}
 function controlIcon(name) {
     if (name == "play") {
         return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="solid-icon" d="M7.8 4.1v15.8L20.1 12z"></path></svg>';
@@ -420,8 +428,8 @@ function controlIcon(name) {
         sortFolders: function(list) {
             var sorted = list.slice();
             sorted.sort((a, b) => {
-                var aFeatured = displayName(a).trim().toLowerCase() == "newmusicfri";
-                var bFeatured = displayName(b).trim().toLowerCase() == "newmusicfri";
+                var aFeatured = isDefaultFirstFolder(a);
+                var bFeatured = isDefaultFirstFolder(b);
                 if (aFeatured != bFeatured) return aFeatured ? -1 : 1;
                 return displayName(a).localeCompare(displayName(b), undefined, {numeric: true, sensitivity: "base"});
             });
