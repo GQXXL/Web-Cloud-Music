@@ -269,7 +269,6 @@ function controlIcon(name) {
         currentIndex: -1,
         loop: 0,
         order: 0,
-        folderSort: getCookie("pcm-folder-sort") || "name-asc",
         isSearching: false,
         searchQuery: "",
         searchTimer: null,
@@ -421,10 +420,10 @@ function controlIcon(name) {
         sortFolders: function(list) {
             var sorted = list.slice();
             sorted.sort((a, b) => {
-                if (this.folderSort == "time-desc") return Number(b.modifiedTime || 0) - Number(a.modifiedTime || 0);
-                if (this.folderSort == "time-asc") return Number(a.modifiedTime || 0) - Number(b.modifiedTime || 0);
-                var result = displayName(a).localeCompare(displayName(b), undefined, {numeric: true, sensitivity: "base"});
-                return this.folderSort == "name-desc" ? -result : result;
+                var aFeatured = displayName(a).trim().toLowerCase() == "newmusicfri";
+                var bFeatured = displayName(b).trim().toLowerCase() == "newmusicfri";
+                if (aFeatured != bFeatured) return aFeatured ? -1 : 1;
+                return displayName(a).localeCompare(displayName(b), undefined, {numeric: true, sensitivity: "base"});
             });
             return sorted;
         },
@@ -900,8 +899,6 @@ function controlIcon(name) {
 
         init : function() {
             var that = this;
-            var sortSelect = H("folder-sort").el;
-            if (sortSelect) sortSelect.value = this.folderSort;
             this.renderAudioQuality(undefined);
             this.renderAlbumArt(undefined);
             this.fetchServerInfo(function() {
@@ -1063,17 +1060,6 @@ function controlIcon(name) {
             H("btn-folder-back").click(function() {
                 that.goBackFolder();
             });
-
-            var sortSelect = H("folder-sort").el;
-            if (sortSelect) {
-                sortSelect.onchange = function() {
-                    that.folderSort = this.value;
-                    setCookie("pcm-folder-sort", that.folderSort, 157680000);
-                    that.renderFolderList();
-                    that.freshSubFolderList(that.subFolders);
-                    that.updateChrome();
-                };
-            }
 
             var searchInput = H("search-input").el;
             if (searchInput) {

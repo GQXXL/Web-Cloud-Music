@@ -282,52 +282,10 @@
 		background: transparent;
 	}
 
-	.sidebar-toolbar {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 10px;
-		margin-bottom: 20px;
-	}
-
 	.text-button {
 		padding: 0 12px;
 		font-size: .9rem;
 		font-weight: 700;
-	}
-
-	.sort-control {
-		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
-		align-items: center;
-		gap: 8px;
-		height: 36px;
-		padding: 0 8px 0 12px;
-		border: 1px solid var(--line);
-		border-radius: 8px;
-		background: var(--surface);
-		color: var(--muted);
-		font-size: .84rem;
-		font-weight: 700;
-	}
-
-	.sort-control select {
-		min-width: 0;
-		border: 0;
-		background: var(--surface);
-		color: var(--text);
-		outline: none;
-		color-scheme: dark;
-	}
-
-	.sort-control select option {
-		background: var(--surface-2);
-		color: var(--text);
-	}
-
-	@media (prefers-color-scheme: light) {
-		.sort-control select {
-			color-scheme: light;
-		}
 	}
 
 	.sidebar-label {
@@ -1259,18 +1217,6 @@
 			<h1 class="ellipsis" id="server-name">Web Cloud Music</h1>
 		</div>
 		<button class="icon-button mobile-close" onclick="w3_close()" title="Close" aria-label="Close">&times;</button>
-	</div>
-
-	<div class="sidebar-toolbar">
-		<label class="sort-control" for="folder-sort">
-			<span>Sort</span>
-			<select id="folder-sort" title="Folder sort">
-				<option value="name-asc">A-Z</option>
-				<option value="name-desc">Z-A</option>
-				<option value="time-desc">Newest</option>
-				<option value="time-asc">Oldest</option>
-			</select>
-		</label>
 	</div>
 
 	<p class="sidebar-label">Folders</p>
